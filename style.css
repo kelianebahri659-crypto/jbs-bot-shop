@@ -1,0 +1,43 @@
+body {
+  background: #111;
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+header {
+  padding: 20px;
+  background: #222;
+}
+
+.categories {
+  margin: 20px;
+}
+
+.categories button {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.produits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.produit {
+  background: #222;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.produit img {
+  width: 100%;
+  border-radius: 5px;
+}
