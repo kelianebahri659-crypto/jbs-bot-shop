@@ -83,3 +83,31 @@ header {
   content: "• ";
   color: #00ff90;
 }
+/* Grille tarifs e-liquide */
+.price-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.price-col {
+  background: #111;
+  border: 1px solid #2b2b2b;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.price-col h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #00ffa2;
+}
+
+.price-col ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
