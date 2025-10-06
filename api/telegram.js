@@ -1,37 +1,53 @@
-// /api/telegram.js  —  Webhook Telegram pour Vercel (site statique)
-module.exports = async (req, res) => {
-  // Répond "OK" aux requêtes GET (health-check)
-  if (req.method !== 'POST') return res.status(200).send('OK');
-
+export default async function handler(req, res) {
   try {
+    if (req.method !== 'POST') return res.status(200).send('OK');
+
+    const update = req.body;
     const token = process.env.TELEGRAM_BOT_TOKEN;
-    const WEBAPP_URL = process.env.WEBAPP_URL || 'https://jbs-bot-shop.vercel.app';
-
-    const update = req.body || {};
-    const msg = update.message || update.edited_message || {};
-    const chatId = msg.chat && msg.chat.id;
-    const text = (msg.text || '').trim();
-
-    // Quand l’utilisateur envoie /menu → bouton qui ouvre ta mini-app
-    if (text === '/menu') {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: 'Bienvenue dans la boutique JBS 🌿\nClique ci-dessous pour ouvrir la mini-app.',
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '🛍️ Ouvrir la boutique', web_app: { url: WEBAPP_URL } }]
-            ]
-          }
-        })
-      });
+    if (!token) {
+      console.error('TELEGRAM_BOT_TOKEN manquant !');
+      return res.status(500).send('Token manquant');
     }
 
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    return res.status(200).json({ ok: false });
+    const API = `https://api.telegram.org/bot${token}`;
+
+    const sendMessage = async (chat_id, text, reply_markup) => {
+      await fetch(`${API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id, text, parse_mode: 'HTML', reply_markup })
+      });
+    };
+
+    const openButton = {
+      inline_keyboard: [[
+        { text: '🛍️ Ouvrir la mini app', web_app: { url: 'https://jbs-bot-shop.vercel.app' } }
+      ]]
+    };
+
+    if (update.message) {
+      const { chat, text } = update.message;
+      if (!chat || !chat.id) return res.status(200).send('OK');
+
+      if (text && text.trim().toLowerCase() === '/menu') {
+        await sendMessage(
+          chat.id,
+          'Bienvenue dans la boutique <b>JBS</b> 🌿 — clique ci-dessous pour ouvrir la mini app 🛍️',
+          openButton
+        );
+      } else if (text && text.startsWith('/start')) {
+        await sendMessage(
+          chat.id,
+          'Salut ! Tape <b>/menu</b> pour ouvrir la boutique JBS 🌿',
+          openButton
+        );
+      }
+    }
+
+    return res.status(200).send('OK');
+  } catch (e) {
+    console.error(e);
+    return res.status(200).send('OK');
   }
-};
+}
+
